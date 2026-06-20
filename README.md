@@ -1,6 +1,6 @@
 # PenT3st — 渗透测试实战工作流 Skill
 
-> 面向 **Claude Code** 的授权渗透测试实战 skill。带强制 checkpoint 的 5 阶段工作流，而非参考手册——每个阶段有 MUST 输出，未通过不进下一阶段。payload / playbook / 案例按需 Read，不准凭记忆生成。
+> 面向 **Claude Code** 的授权渗透测试实战 skill。带强制 checkpoint 的 5 阶段工作流，而非参考手册——每个阶段有 MUST 输出，未通过不进下一阶段。payload / playbook / 案例按需 Read。
 
 ---
 
