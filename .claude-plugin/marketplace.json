@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "PenT3st",
+  "owner": {
+    "name": "PenT3st Team"
+  },
+  "metadata": {
+    "description": "渗透测试实战 skill for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "PenT3st",
+      "source": ".",
+      "version": "0.1.0",
+      "category": "security",
+      "tags": ["security", "pentest", "penetration-testing"],
+      "license": "MIT"
+    }
+  ]
+}

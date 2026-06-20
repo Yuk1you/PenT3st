@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+*.swo
+
+# 临时/缓存
+*.log
+*.tmp
+*.bak
+.cache/
+__pycache__/
+*.pyc
+
+# 渗透测试产物（不入仓库）
+*.pcap
+*.pcapng
+*.har
+evidence/
+screenshots/
+output/
+reports/output/
+
+# 凭据/密钥（防止误传）
+*.key
+*.pem
+.env
+.env.*
+secrets.txt
+credentials.json
+
+# 不排除 references/h1-reports/（含 raw 原文，本次全量上传）
