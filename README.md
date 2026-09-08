@@ -1,5 +1,7 @@
 # PenT3st — 渗透测试实战工作流 Skill
 
+> **v2.0.0**（2026-09-06）：新增"行为纪律"节（范围双检/请求预算/封禁连坐等 12 条）、注入三段差分验证、验证码辨型、客户端自述认证绕过、存量复测监控、APK 静态→动态闭环，Tavily 网络搜索默认。前版归档于 `../PenT3st-V1.0.0`。
+
 > 面向 **Claude Code** 的授权渗透测试实战 skill。带强制 checkpoint 的 5 阶段工作流，而非参考手册——每个阶段有 MUST 输出，未通过不进下一阶段。payload / playbook / 案例按需 Read。
 
 ---
@@ -8,7 +10,7 @@
 
 PenT3st 把一次授权渗透测试拆成 **5 个阶段**（Scope → Recon → Discover → Exploit → Report），每个阶段用**多角色协作**（Planner / Searcher / Pentester / Coder / Reporter / Monitor）推进，并在关键节点设 checkpoint 强制对齐授权范围与证据链。
 
-与 SRC/Bug Bounty 不同，渗透测试**指向性强**——有明确目标和授权，确认范围后直接进入信息收集与攻击面测绘，目标是**深度突破**而非广泛搜索。Phase 4 明确允许在授权范围内做提权、横向移动与后渗透，展示真实影响。
+授权渗透测试**指向性强**——有明确目标和授权，确认范围后直接进入信息收集与攻击面测绘，目标是**深度突破**而非广泛搜索，追求链路完整（权限/数据/全链）。Phase 4 明确允许在授权范围内做提权、横向移动与后渗透，展示真实影响。
 
 ### 核心特性
 
@@ -87,7 +89,7 @@ PenT3st/
     │   └── report-pentest.md         # 渗透测试报告模板
     ├── tools/
     │   └── mcp-jshook.md             # jshook MCP 工具映射
-    └── h1-reports/                   # HackerOne 真实已披露案例（按 weakness 分类）
+    └── h1-reports/                   # 真实已披露漏洞案例（按 weakness 分类）
 ```
 
 ---
@@ -145,8 +147,8 @@ PenT3st Phase 5：读合规红线 → 套报告模板 → 输出完整报告
 
 ## 数据基础
 
-- **HackerOne 已披露 High/Critical 报告**：2,887 份，按 weakness 分类存放于 `references/h1-reports/by-weakness/`，每份含程序、赏金、标题、摘要。引用前必须 Read 实际文件，不准凭记忆编案例编号。
-- **WooYun 案例统计**：77,000+ 条历史案例，提炼为各 playbook 的参数频率表、高危占比、真实指纹。
+- **真实已披露漏洞案例**：2,887 份 High/Critical 报告，按 weakness 分类存放于 `references/h1-reports/by-weakness/`，每份含来源、标题、摘要。引用前必须 Read 实际文件，不准凭记忆编案例编号。
+- **历史漏洞案例统计**：77,000+ 条，提炼为各 playbook 的参数频率表、高危占比、真实指纹。
 - **结构化 payload**：305 个 + 263 个 WAF/EDR 绕过变体，均带上下文标注（HTML/属性/JS字符串/URL）。
 
 ---

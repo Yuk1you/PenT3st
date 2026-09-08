@@ -1,6 +1,6 @@
 ---
 name: PenT3st
-description: "渗透测试实战工作流 skill。融合多 Agent 协作、动态工具检测、智能任务规划。5 阶段方法论（scope → recon → discover → exploit → report）、19 类攻击 playbook、305 个结构化 payload、263 个 WAF/EDR 绕过变体、2887 份 HackerOne 真实案例、国产组件指纹库。当用户提到 \"渗透测试 / pentest / 渗透 / PenT3st / 红队\" 或给出明确目标让你测试时触发。"
+description: "渗透测试实战工作流 skill。融合多 Agent 协作、动态工具检测、智能任务规划。5 阶段方法论（scope → recon → discover → exploit → report）、19 类攻击 playbook、305 个结构化 payload、263 个 WAF/EDR 绕过变体、国产组件指纹库。当用户提到 \"渗透测试 / pentest / 渗透 / PenT3st / 红队\" 或给出明确目标让你测试时触发。"
 argument-hint: "<target-or-scope-or-phase>"
 level: 2
 ---
@@ -9,7 +9,7 @@ level: 2
 
 这是一个**带强制 checkpoint 的渗透测试工作流**，不是参考手册。每个阶段有 MUST 输出，未通过不进下一阶段。详细 payload / playbook / 案例**按需 Read**，不准凭记忆生成。
 
-与 SRC/Bug Bounty 不同，渗透测试**指向性强**——有明确的目标和授权，确认范围后直接进入信息收集与攻击面测绘，目标是深度突破而非广泛搜索。
+授权渗透测试**指向性强**——有明确的目标和授权，确认范围后直接进入信息收集与攻击面测绘，目标是深度突破而非广泛搜索，追求链路完整（权限/数据/全链）而非发现即止。
 
 ---
 
@@ -28,10 +28,34 @@ level: 2
 ## 反幻觉硬约束（全程适用）
 
 1. **不准凭记忆出 payload**。要给 SQLi/RCE/SSRF/XSS 任何 payload 前，先 Read 对应 `references/playbooks/<type>.md`（或 `<type>/00-index.md` + 具体子文件，见下表）。payload 必须能在文件里查到出处。
-2. **不准编造案例编号**。引用 H1/WooYun 案例前必须 Read `references/h1-reports/by-weakness/` 下的实际文件。说不出文件路径就别引。
+2. **不准编造案例/编号**。引用任何外部案例或编号前，必须 Read 实际出处文件（说不出文件路径就别引）；无法给出处的观察一律标"待验证"。
 3. **无证据不下结论**。无 HTTP 包/截图/视频时只能写"待验证 / 假设"，不写"已确认 / 发现漏洞"。
 4. **出 scope 立即停**。任何时候发现要测的资产不在 Phase 1 已确认的授权范围 → 立即停手，回到 Phase 1 重核。
 5. **合法合规**。必须确认已获得合法授权再开始测试，未授权渗透测试是违法行为。
+
+---
+
+## 行为纪律（全程适用）
+
+**A. 范围 / 上报纪律（硬性）**
+1. **范围双检硬性规定**：每个候选上报前必须自行完成双检——①是否在授权范围内 ②是否命中得分条款（有实质影响：权限/数据/完整链；oracle/配置泄露/静态证据不给分）。**双检不过 → 不上报仅留档**，不等用户问、不等提醒。范围判定**前置到侦察阶段**，不是发现漏洞后才判。
+2. **测绘数据有时效**：外部测绘/EASM 快照（子域、存活、指纹）可能过期，测前先自行验活（如 DNS/HTTP 探测），别信过期的资产清单。
+3. **负结果诚实记录**：负结论（排除/闭合/不可达）也要落盘成档，如实登记——避免浪费申报额度、避免后续重复打已闭合资产。
+
+**B. 会话 / 节流纪律**
+4. **会话内清单化机制**：用户口头规则立即写入会话持续检查清单，每次探测/上报前强制过一遍，避免"用户说完跟没听见一样"。
+5. **同主域封禁连坐**：同一主域下多子系统常共享 WAF 封禁域，并发打点会连坐全封——需全局节流与错峰，多系统打点前先评估连坐风险。
+6. **请求预算**：单脚本默认请求预算 ≤3，超预算必须人工确认；脚本内置异常检测 + 指数退避。新目标先探每会话/每 IP 请求配额再定打法。
+7. **跨会话笔记机制**：接替会话先读会话笔记（SESSION_NOTES），结束前更新——避免重复打已闭合资产、避让活跃会话。
+
+**C. 技术判别纪律**
+8. **证据自动化落盘**：探测脚本自动落盘 `summary.txt` + 关键响应**原始包**（+脚本+日志三件套）；只留原始数据，不加自造字段。原始包是评审认可的唯一证据形态。
+9. **响应异常三分法**：连接/响应异常先三分判别——本地准入劫持 / 目标 WAF / 服务端限流（用响应体特征指纹），再对症，不误判目标防护。
+10. **准确接口名先提取**：不盲猜接口方法名，先 grep 已固化页面提取准确 `.do`/端点名再发请求（盲猜浪费配额且触发服务端限流）。
+11. **横向扩展 + 边界确认**：发现单点越权/IDOR 后用字典/相邻号扩展，并做 3 跨度 + 边界外对照确认数据边界，量化影响面再上报。
+12. **短信轰炸向量合规线**：send-code 无频控可作骚扰向量但**非权限/数据**——识别后只留档不深测，与"写操作合规停手"并列。
+
+**扩大利用原则**：有漏洞就继续利用扩大战果，不要停在"发现"。发现 → 验证 → 扩大利用（拉数据/提权/横向）→ 停在拿不到更多为止。
 
 ---
 
@@ -89,6 +113,17 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 2. **无工具就降级**：给出手动执行命令，让用户执行后贴回结果
 3. **不强制依赖**：任何 Phase 都不因缺少某个工具而中断
 4. **用户做主**：工具选择建议由用户最终确认
+5. **网络搜索默认用 Tavily**：查 CVE / 最新漏洞 / 组件情报 / 漏洞利用细节等网络搜索，默认调用 Tavily API；WebSearch 不可用/返回空时直接用 Tavily，不反复重试。跨平台调用模板（PowerShell / bash）：
+   ```powershell
+   $k=$env:TAVILY_API_KEY
+   $body=@{api_key=$k; query="<组件名 版本 CVE 漏洞>"; search_depth="advanced"; max_results=5}|ConvertTo-Json
+   Invoke-RestMethod -Uri "https://api.tavily.com/search" -Method Post -ContentType "application/json" -Body $body
+   ```
+   ```bash
+   curl -s -X POST https://api.tavily.com/search -H "Content-Type: application/json" \
+     -d "{\"api_key\":\"$TAVILY_API_KEY\",\"query\":\"<组件名 版本 CVE 漏洞>\",\"search_depth\":\"advanced\",\"max_results\":5}"
+   ```
+   （未配置 `TAVILY_API_KEY` 时，用环境可用的任一网络搜索工具替代）
 
 ---
 
@@ -173,6 +208,9 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 | 资产含 银行 / 支付 / 网银 / 第三方支付聚合 | `references/industry/banking-finance.md` |
 | 资产含 运营商 / BOSS / 网管 / 物联网卡 | `references/industry/telecom-isp.md` |
 | 不确定优先级怎么排 | `references/methodology/01-attack-priority.md` |
+| 指纹命中任何组件（国产/开源组件，有版本更好） | **MUST** 先网络搜索（Tavily，模板见上文"工具调用原则"第 5 条）查该组件最新 CVE，近 12 个月优先 → 针对性验证 |
+
+**指纹 → CVE 规则**：指纹识别命中组件后，**不直接打记忆中的历史 payload**——先查该组件最新 CVE 再针对性验证（新披露 CVE 的验证脚本与利用面往往更完整，命中率高）。
 
 ---
 
@@ -203,6 +241,15 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 4. 按 playbook 的"payload 库"探测——payload 来自文件，不来自训练记忆
 5. 被 WAF 拦 → Read `references/methodology/02-bypass-toolkit.md` 决策树
 6. 命中后立即按下方"测试过程记录"MUST 输出完整记录 → 标记为 Phase 4 候选
+
+### 场景专项检查（强制，命中场景才执行）
+
+- **登录/注册验证码**：先**辨型**——vcode 字段绑的是图形码还是短信码（看输入框 minlength/maxlength、按钮文案"换一张"vs"获取验证码"、JS sendCode 逻辑与渲染顺序）。图形码通常只生成 imageCodeId 不参与服务端校验。**同一方向连续 3 次同错 → 触发"换假设"**，禁止继续同方向重试。再验证码复用/消费时机：同 token 重复提交错误码，响应恒定=仅成功时消费（可复用）；含递增计数器=可当枚举 oracle。短信双因素：send-code 无账号枚举、确认真发短信后**立即停手**（扰民线），定性"双因素锁死"即闭合。
+- **注入类测试（任何参数疑似进 DB/SQL）**：强制**三段差分验证**——
+  1. 单引号 → 异常体差分（状态码+长度+响应体三重对比）
+  2. 注释符（`--`/`#`）→ 空结果/异常差分（区分 WAF 拦截与语法变化）
+  3. `%27` 等 URL 编码重放 → 确认 WAF 是否只做明文匹配
+  **附加规则**：单包异常 ≠ 注入成立，WAF 403 是拦截行为不是注入证据；**500 语法错 + 200 注释闭合的成对差分才是注入实锤**；WAF 拦截页带唯一编号/体积递增 = 动态计数升级（穿透词清单需实测：编码后的 `%'`/`--`/`||` 常放行，`and`/`or`/`union` 多形态全拦）；布尔/时间盲注遇 WAF 动态策略不稳 → 按抽样原则停手保已确认证据；ORM 参数化类负结论 → 明确写"已排除"并关闭该线。
 
 ### MUST 输出：测试过程记录（每个确认漏洞一份）
 
@@ -240,10 +287,12 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 | 上传点 + 解析漏洞 | `references/playbooks/file-upload/00-index.md` |
 | 用户输入回显到 HTML / JS | `references/playbooks/xss/00-index.md` |
 | 反代 + Content-Length / TE | `references/playbooks/http-smuggling.md` |
-| GraphQL endpoint / introspection | `references/playbooks/graphql.md` |
+| GraphQL endpoint / introspection | `references/playbooks/graphql.md` — introspection 关闭时从前端 bundle 静态提取 schema（nodes/mutations/权限模型）再批量探测；多租户 HTTP 自定义头（`tenant:`）做常见值枚举看鉴权差分 |
+| 加密锁 / U盾 / 扫码 / 桌面控件（ActiveX/WebSocket 本地端口）/ 客户端自述标识 | 客户端自述身份认证绕过：校验若全在客户端（明文硬编码 PIN）+ 服务端只收自述标识（单位代码/序列号）→ 认证绕过点；规整编号猜高权限账号（全零/顺位/全 F） |
+| 登录/注册验证码提交前 | 验证码辨型检查点（见上方"场景专项检查"）— 先辨型再打 |
 | 并发 / TOCTOU | `references/playbooks/race-conditions.md` |
 | ReDoS / 资源不限速 / 算法爆炸 | `references/playbooks/dos.md` |
-| APK / IPA / 移动端 | `references/playbooks/mobile.md` |
+| APK / IPA / 移动端 | `references/playbooks/mobile.md` — 静态逆向输出四件套（后端域名/UAT 路径/API 全集/硬编码密钥）；多市场源先 MD5 diff 确认同一包；**硬编码凭证 ≠ 权限**（先验用户态/内网隔离再定性）；静态清单中"协议未知/有签名/有频控"链路转动态（模拟器 + 系统级 CA 信任 + UI 走链）闭环 |
 | LLM agent / prompt 入口 / 工具调用 | `references/playbooks/llm-prompt-injection/00-index.md` |
 
 **两步 Read 模式（已拆分的 playbook）**：目录形式的 playbook（`rce/` / `oauth-saml-jwt/` / `ssrf-cache-host/` / `api-rest/` / `logic-flaws/` / `file-upload/` / `path-traversal/` / `xss/` / `llm-prompt-injection/` / `intranet-postexp/`）第一步只 Read `00-index.md`——它含**子文件路由表**和通用方法论。**不要把 00-index 当 payload 库用**，据子文件路由定位到具体场景后**再 Read 对应子文件**（如 `rce/14-ssti.md` / `oauth-saml-jwt/12-jwt.md`）。单文件形式的 playbook（`sqli.md` 等）直接 Read 即可。
@@ -278,7 +327,7 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 
 **进入条件**：Phase 3 至少一个漏洞已确认可触发。
 
-这是渗透测试区别于 SRC 的关键阶段——不止于发现漏洞，要尝试**深度利用、权限提升和横向移动**，展示真实影响。
+这是**利用阶段**——不止于发现漏洞，要刻意**扩大战果**（见"行为纪律"的扩大利用原则），尝试**深度利用、权限提升和横向移动**，展示真实影响。
 
 ### Planner 预规划
 
@@ -295,6 +344,16 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 </task_assignment>
 ```
 
+### 高价值通道优先（认证绕过类）
+
+**客户端自述身份认证绕过**（加密锁/U盾/控件通道，发现即优先，常达严重级）：
+1. 登录页找非传统通道（加密锁/U盾/扫码/桌面控件 ActiveX/WebSocket 本地端口）
+2. 逆向前端 JS，确认 PIN/密码/签名校验是否**全在客户端**完成（明文硬编码 PIN 常量 = 强信号，无服务端往返）
+3. 服务端建会话接口若只收自述标识（单位代码/序列号/用户名）→ 绕过点成立
+4. 差分验证：无效标识（拒绝/空响应）vs 规整值（服务端真实处理）
+5. 规整编号猜高权限账号：全零/顺位/全 F 常指向运营方超管；相邻编号差分（登录计数累加证服务端宽松匹配）
+6. **全程只读**，写接口仅识别不执行（合规红线）
+
 ### Pentester + Coder 协作执行
 
 **MUST Read** `references/methodology/12-exploit-postexp.md`——完整漏洞利用与后渗透工作流，包含利用前影响评估检查表、利用链构建决策、PoC 编写规范、Linux 权限提升（SUID/Capabilities/Sudo/Cron/内核/容器逃逸）、Windows 权限提升（服务/令牌模拟/UAC 绕过/AlwaysInstallElevated）、横向移动（凭据收集 + Pass-the-Hash + Kerberoasting + 域攻击 DCSync/Golden Ticket/BloodHound）、清理流程与验证。
@@ -309,6 +368,7 @@ PenT3st **不绑定任何固定工具**，根据用户实际安装的 MCP 服务
 5. 横向移动 → 按 `12-exploit-postexp.md` 第四节：凭据收集 → PtH/PtT → 内网探测 → 域攻击
 6. **每一步都记录测试过程**：文字描述做了什么操作（不是只甩命令）+ 命令输出截图 / 文本回显 / 网络包。命令型证据同样遵循 Phase 3 的"文字复现流程 + 截图 + 差分 + 复现稳定性"四要素。
 7. 测试完成后 → 按 `12-exploit-postexp.md` 第五节**清理流程 checklist**，逐项确认
+8. **存量漏洞复测（长期/多轮任务）**：对已报漏洞周期复测——已修复的存量证据（截图+原始响应）仍计分；未修复复测可作催办升级材料；同域修复一个点后快速扫同 pattern 是否全量修复。同服务多协议暴露面可绕单端口封禁（续测前确认不违反授权范围）。
 
 ### Coder 角色任务
 

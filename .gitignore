@@ -36,3 +36,6 @@ secrets.txt
 credentials.json
 
 # 不排除 references/h1-reports/（含 raw 原文，本次全量上传）
+
+# Claude Code 会话元数据（不入仓库）
+.omc/
